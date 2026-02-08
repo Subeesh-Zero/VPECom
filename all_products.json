@@ -1,20 +1,5 @@
 [
   {
-    "id": 1770551144256,
-    "title": "pctry",
-    "price": "2000",
-    "category": "pc",
-    "offer": "50",
-    "description": "ffffffffff",
-    "buyLink": "https://www.blogger.com/blog/post/edit/5743183806663359383/203756871903625002",
-    "images": [
-      "images/pctry_1770551144256_0.webp",
-      "images/pctry_1770551144256_1.webp",
-      "images/pctry_1770551144256_2.webp"
-    ],
-    "image": "images/pctry_1770551144256_0.webp"
-  },
-  {
     "id": 1770540571889.1177,
     "title": "Git3",
     "category": "Hi",
