@@ -9,7 +9,7 @@ import sys
 import shutil
 from threading import Timer
 
-# --- 1. லைப்ரரி இல்லாத பட்சத்தில் தானாக இன்ஸ்டால் செய்தல் ---
+# --- 1. Auto Install Libraries ---
 def install_libs():
     try:
         import flask
@@ -24,7 +24,7 @@ from PIL import Image
 
 app = Flask(__name__)
 
-# --- 2. செட்டிங்ஸ் ---
+# --- 2. CONFIGURATION ---
 CONFIG_FILE = "shop_config.json"
 IMAGE_FOLDER = "images"
 JSON_FILE = "all_products.json"
@@ -52,8 +52,8 @@ SETUP_TEMPLATE = """
 </head>
 <body>
     <div class="card">
-        <h2>🚀 Ultimate Shop Setup</h2>
-        <p>Supports 100k+ Images & Full Delete</p>
+        <h2>🚀 Image Upload Fix</h2>
+        <p>100k+ Support + Force Upload</p>
         <input type="text" id="repoUrl" placeholder="Paste GitHub Repo Link Here...">
         <button onclick="startSetup()" id="btn">Connect Now</button>
         <div class="loader" id="loader"></div>
@@ -62,7 +62,7 @@ SETUP_TEMPLATE = """
     <script>
         async function startSetup() {
             const url = document.getElementById('repoUrl').value.trim();
-            if(!url) return alert("GitHub Link தேவை!");
+            if(!url) return alert("GitHub Link Required!");
             document.getElementById('btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
             document.getElementById('msg').innerText = "Configuring Git... (Wait)";
@@ -372,13 +372,13 @@ def upload():
         return jsonify({"success": False, "error": str(e)})
 
 # ==========================================
-# 🚀 SMART PUSH (FIXED: SPARSE CHECKOUT ADD)
+# 🚀 SMART PUSH (FIXED: FORCE ADD IMAGES)
 # ==========================================
 def smart_push(msg):
     try:
         subprocess.run(["git", "branch", "-M", "main"], check=False)
 
-        # FIX: 'git add --sparse .' allows adding files outside sparse definition
+        # 🔥 THE MAGIC FIX: FORCE ADD SPARSITY 🔥
         subprocess.run(["git", "add", "--sparse", "."], check=True)
         
         subprocess.run(["git", "commit", "-m", msg], check=False)
