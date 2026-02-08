@@ -53,8 +53,8 @@ SETUP_TEMPLATE = """
 </head>
 <body>
     <div class="card">
-        <h2>🚀 Final Fix Mode</h2>
-        <p>Fixing Image Upload & Git Warnings...</p>
+        <h2>🚀 Final Image Fix</h2>
+        <p>Fixing Git Permissions...</p>
         <input type="text" id="repoUrl" placeholder="Paste GitHub Repo Link Here...">
         <button onclick="startSetup()" id="btn">Connect Now</button>
         <div class="loader" id="loader"></div>
@@ -66,7 +66,7 @@ SETUP_TEMPLATE = """
             if(!url) return alert("GitHub Link Required!");
             document.getElementById('btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
-            document.getElementById('msg').innerText = "Configuring Git... (Wait)";
+            document.getElementById('msg').innerText = "Configuring Git Rules... (Wait)";
             try {
                 const res = await fetch('/api/setup', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ url: url }) });
                 const data = await res.json();
@@ -207,8 +207,7 @@ ADMIN_TEMPLATE = """
         function resetForm() { document.getElementById('editIndex').value = "-1"; document.getElementById('formTitle').innerText = "Single Upload"; document.getElementById('saveBtn').innerText = "🚀 Upload Product"; multiFiles = []; existingImages = []; renderPreviews(); document.querySelectorAll('#add-product input, #add-product textarea').forEach(i => i.value=""); }
         async function saveMultiProduct() {
             const title = document.getElementById('pTitle').value; const price = document.getElementById('pPrice').value; if(!title || !price) return Swal.fire("Error", "Title & Price Required", "error");
-            // 🔥 CHANGED TEXT HERE TO AVOID CONFUSION 🔥
-            Swal.fire({ title: 'Uploading...', text: 'Uploading Products & Images...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Uploading...', text: 'Updating & Pushing Images...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             let imagesBase64 = []; for(let f of multiFiles) { const r = new FileReader(); const p = new Promise(res => { r.onload = e => res(e.target.result); }); r.readAsDataURL(f); imagesBase64.push(await p); }
             const payload = { editIndex: document.getElementById('editIndex').value, products: [{ title, price, category: document.getElementById('pCategory').value, offer: document.getElementById('pOffer').value, desc: document.getElementById('pDesc').value, link: document.getElementById('pLink').value, images: imagesBase64, existingImages: existingImages }] };
             await sendToServer(payload); resetForm();
@@ -257,7 +256,7 @@ def setup_api():
         subprocess.run(["git", "branch", "-M", "main"], check=True) 
         subprocess.run(["git", "remote", "add", "origin", repo_url], check=True)
         
-        # 🔥 DISABLE WARNING THAT STOPS UPLOAD 🔥
+        # 🔥 DISABLE THE SPARSE WARNING (THE REAL FIX) 🔥
         subprocess.run(["git", "config", "advice.updateSparsePath", "false"], check=False)
         
         # 2. SPARSE CHECKOUT
@@ -372,33 +371,29 @@ def upload():
         return jsonify({"success": False, "error": str(e)})
 
 # ==========================================
-# 🚀 SMART PUSH (FIXED: FORCE ADD + REBASE)
+# 🚀 SMART PUSH (FIXED: DISABLE WARNING & FORCE ADD)
 # ==========================================
 def smart_push(msg):
     try:
-        # 1. FORCE BRANCH
         subprocess.run(["git", "branch", "-M", "main"], check=False)
 
-        # 2. FORCE ADD (Explicitly add everything even if sparse warns)
+        # 🔥 1. DISABLE WARNING (Just in case setup missed it)
+        subprocess.run(["git", "config", "advice.updateSparsePath", "false"], check=False)
+
+        # 🔥 2. FORCE ADD IMAGES (With --sparse flag)
         subprocess.run(["git", "add", "--sparse", "."], check=True)
-        # Safety net: Try normal add too, just in case
-        subprocess.run(["git", "add", "."], check=False)
         
-        # 3. COMMIT
         subprocess.run(["git", "commit", "-m", msg], check=False)
         
-        # 4. PUSH (With Auto-Rebase Fix)
         res = subprocess.run(["git", "push", "-u", "origin", "main"], capture_output=True, text=True)
         
         if res.returncode != 0:
-            print("⚠️ Push Failed! Pulling with Rebase...")
-            # Use Rebase to avoid 'non-fast-forward' errors
-            subprocess.run(["git", "pull", "--rebase", "origin", "main"], check=False)
+            print("Syncing JSON...")
+            subprocess.run(["git", "pull", "origin", "main", "--no-rebase", "--allow-unrelated-histories"], check=False)
             subprocess.run(["git", "push", "-u", "origin", "main"], check=True)
-            print("✅ Success after rebase!")
 
     except Exception as e:
-        print(f"❌ Git Error: {e}")
+        print(f"Git Error: {e}")
         raise e
 
 def open_browser():
