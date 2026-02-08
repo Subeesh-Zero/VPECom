@@ -1,18 +1,5 @@
 [
   {
-    "id": 1770557864003,
-    "title": "q",
-    "price": "22",
-    "category": "Comedy",
-    "offer": "1",
-    "description": "s",
-    "buyLink": "https://github.com/Subeesh-Zero/VPECom.git",
-    "images": [
-      "images/q_1770557864003_0.webp"
-    ],
-    "image": "images/q_1770557864003_0.webp"
-  },
-  {
     "title": "r",
     "price": "4",
     "category": "General",
