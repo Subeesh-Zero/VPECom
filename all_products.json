@@ -1,20 +1,5 @@
 [
   {
-    "id": 1770549448489,
-    "title": "pc",
-    "price": "1000",
-    "category": "pc",
-    "offer": "50",
-    "description": "ggggg",
-    "buyLink": "https://www.blogger.com/blog/post/edit/5743183806663359383/1706552226416488922",
-    "images": [
-      "images/pc_1770549448489_0.webp",
-      "images/pc_1770549448489_1.webp",
-      "images/pc_1770549448489_2.webp"
-    ],
-    "image": "images/pc_1770549448489_0.webp"
-  },
-  {
     "id": 1770540576763.5532,
     "title": "Git4",
     "category": "Comedy",
