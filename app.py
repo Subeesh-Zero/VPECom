@@ -15,6 +15,7 @@ def install_libs():
         import flask
         import PIL
     except ImportError:
+        print("Installing Libraries...")
         subprocess.check_call([sys.executable, "-m", "pip", "install", "Flask", "Pillow"])
 
 install_libs()
@@ -43,7 +44,6 @@ SETUP_TEMPLATE = """
         body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
         .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 400px; }
         h2 { color: #4F46E5; margin-bottom: 10px; }
-        p { color: #666; font-size: 14px; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: #4F46E5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition:0.3s; }
         button:hover { background: #4338ca; }
@@ -53,8 +53,8 @@ SETUP_TEMPLATE = """
 </head>
 <body>
     <div class="card">
-        <h2>🚀 Ultimate Shop Setup</h2>
-        <p>Supports 100k+ Images & Fast Upload</p>
+        <h2>🚀 Image Fix Mode</h2>
+        <p>Fixing "Git Add" Error...</p>
         <input type="text" id="repoUrl" placeholder="Paste GitHub Repo Link Here...">
         <button onclick="startSetup()" id="btn">Connect Now</button>
         <div class="loader" id="loader"></div>
@@ -63,10 +63,10 @@ SETUP_TEMPLATE = """
     <script>
         async function startSetup() {
             const url = document.getElementById('repoUrl').value.trim();
-            if(!url) return alert("GitHub Link தேவை!");
+            if(!url) return alert("GitHub Link Required!");
             document.getElementById('btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
-            document.getElementById('msg').innerText = "Configuring Git & Sparse Checkout... (Wait)";
+            document.getElementById('msg').innerText = "Configuring Git... (Wait)";
             try {
                 const res = await fetch('/api/setup', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ url: url }) });
                 const data = await res.json();
@@ -307,18 +307,15 @@ def delete_item():
             with open(JSON_FILE, 'r') as f: products = json.load(f)
             
             if 0 <= idx < len(products):
-                # 1. DELETE IMAGES FROM GIT (NEW FIX)
                 item = products[idx]
+                # Force delete from git index even if sparse or missing locally
                 if 'images' in item:
                     for img in item['images']:
-                        # Force delete from git even if file missing locally
-                        subprocess.run(["git", "rm", "-f", img], check=False)
+                        subprocess.run(["git", "rm", "--cached", "--ignore-unmatch", img], check=False)
 
-                # 2. REMOVE FROM JSON
                 products.pop(idx)
                 with open(JSON_FILE, 'w') as f: json.dump(products, f, indent=2)
                 
-                # 3. PUSH CHANGES
                 smart_push("Deleted Item")
                 
         return jsonify({"success": True})
@@ -373,13 +370,13 @@ def upload():
         return jsonify({"success": False, "error": str(e)})
 
 # ==========================================
-# 🚀 SMART PUSH (FIXED: FORCE ADD IMAGES)
+# 🚀 SMART PUSH (THE FIX: FORCE ADD SPARSITY)
 # ==========================================
 def smart_push(msg):
     try:
         subprocess.run(["git", "branch", "-M", "main"], check=False)
 
-        # 🔥 THE MAGIC FIX: FORCE ADD SPARSITY 🔥
+        # 🔥 THE FIX: USE --sparse TO FORCE ADD IMAGES 🔥
         subprocess.run(["git", "add", "--sparse", "."], check=True)
         
         subprocess.run(["git", "commit", "-m", msg], check=False)
