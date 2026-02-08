@@ -1,18 +1,5 @@
 [
   {
-    "id": 1770562429765,
-    "title": "horce",
-    "price": 200,
-    "category": "Pc",
-    "offer": 50,
-    "description": "gg",
-    "buyLink": "https://github.com/Subeesh-Zero/VPECom/tree/main",
-    "images": [
-      "https://raw.githubusercontent.com/Subeesh-Zero/VPECom/main/images/p_1770568301545_0.webp"
-    ],
-    "image": "https://raw.githubusercontent.com/Subeesh-Zero/VPECom/main/images/p_1770568301545_0.webp"
-  },
-  {
     "id": 1770561777892,
     "title": "t",
     "price": "44",
