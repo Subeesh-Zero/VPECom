@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VPECom Store</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* RESET & VARS */
+        * { box-sizing: border-box; }
+        :root {
+            --primary: #2874f0; 
+            --yellow: #ffe500; 
+            --dark: #212121;
+            --grey: #878787;
+            --bg: #f1f3f6;
+            --white: #ffffff;
+        }
+
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+
+        /* HEADER */
+        header { background-color: var(--primary); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .nav-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; height: 55px; }
+        .left-section { display: flex; align-items: center; gap: 15px; }
+        .hamburger { color: white; font-size: 22px; cursor: pointer; }
+        .logo { color: white; font-size: 18px; font-weight: 700; font-style: italic; text-decoration: none; display: flex; flex-direction: column; line-height: 1; }
+        .logo span { font-size: 10px; color: var(--yellow); font-weight: 500; }
+        .nav-icons { display: flex; gap: 20px; color: white; font-size: 20px; }
+
+        /* SEARCH */
+        .search-container { padding: 0 10px 10px 10px; }
+        .search-box { background: white; border-radius: 6px; display: flex; align-items: center; padding: 10px 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .search-box input { border: none; outline: none; width: 100%; font-size: 14px; margin-left: 10px; color: #333; background: transparent; }
+
+        /* BANNER & CAT STRIP */
+        #offer-banner { background: linear-gradient(90deg, #ff9f00 0%, #ff6f00 100%); color: white; text-align: center; padding: 8px; font-size: 12px; font-weight: 700; display: none; }
+        
+        .cat-strip { background: white; padding: 10px; margin-bottom: 8px; white-space: nowrap; overflow-x: auto; display: flex; gap: 10px; scrollbar-width: none; border-bottom: 1px solid #e0e0e0; min-height: 45px; align-items: center; }
+        .cat-pill { background: #f0f5ff; border: 1px solid #dbeafe; padding: 6px 14px; border-radius: 50px; font-size: 13px; font-weight: 500; color: #333; cursor: pointer; transition: 0.2s; }
+        .cat-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: 0; left: -100%; width: 280px; height: 100vh; background: white; z-index: 2000; transition: 0.3s; overflow-y: auto; }
+        .sidebar.active { left: 0; }
+        .sidebar-header { background: var(--primary); color: white; padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .user-icon { font-size: 24px; background: white; color: var(--primary); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .menu-group { border-bottom: 1px solid #f0f0f0; padding: 10px 0; }
+        .menu-item { padding: 12px 20px; display: flex; align-items: center; gap: 15px; color: var(--dark); font-size: 15px; cursor: pointer; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1500; display: none; }
+        .overlay.active { display: block; }
+
+        /* MAIN GRID */
+        .container { padding: 8px; min-height: 60vh; position: relative; }
+        
+        /* Grid Fix: Mobile Side-by-Side */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 Col Mobile */
+            gap: 10px;
+            align-items: start;
+        }
+        @media(min-width: 768px) { .product-grid { grid-template-columns: repeat(5, 1fr); gap: 15px; } }
+
+        /* CARD */
+        .card { 
+            background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; 
+            position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; 
+            flex-direction: column; width: 100%; transition: transform 0.2s;
+        }
+        .card:active { transform: scale(0.98); }
+
+        .card-img { width: 100%; height: auto; display: block; background: #f9f9f9; min-height: 120px; object-fit: cover; }
+        
+        .details { padding: 10px; }
+        .title { font-size: 13px; color: #444; font-weight: 500; line-height: 1.4; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 36px; }
+        
+        .price-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .price { font-size: 15px; font-weight: 700; color: #212121; }
+        .mrp { font-size: 11px; color: var(--grey); text-decoration: line-through; }
+        .off { font-size: 11px; color: #388e3c; font-weight: 700; }
+        
+        /* STATUS */
+        .status-container {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            width: 100%; height: 50vh; text-align: center; color: #666; grid-column: 1 / -1; 
+        }
+        .no-result i { font-size: 40px; color: #ddd; margin-bottom: 15px; }
+        .fa-spinner { color: var(--primary); font-size: 30px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="user-icon"><i class="fas fa-user"></i></div>
+            <div>
+                <div style="font-size:16px; font-weight:600;">Hello, User</div>
+                <div style="font-size:12px; opacity:0.9;">Welcome to VPECom</div>
+            </div>
+        </div>
+        <div class="menu-group">
+            <div style="padding:10px 20px; font-size:12px; color:#999; text-transform:uppercase;">Categories</div>
+            <div id="sidebar-cats">Loading...</div>
+        </div>
+    </div>
+
+    <header>
+        <div class="nav-top">
+            <div class="left-section">
+                <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+                <a href="#" class="logo">VPECom <span>Explore Plus <i class="fas fa-star" style="color:#ffe500; font-size:8px;"></i></span></a>
+            </div>
+            <div class="nav-icons"><i class="fas fa-shopping-cart"></i></div>
+        </div>
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search" style="color:#2874f0;"></i>
+                <input type="text" id="searchInput" placeholder="Search products..." onkeyup="searchProducts(this.value)">
+            </div>
+        </div>
+    </header>
+
+    <div id="offer-banner">🎉 FLAT <span id="offer-val">0</span>% OFF ON EVERYTHING!</div>
+    <div class="cat-strip" id="top-cat-strip"><div style="font-size:12px; color:#999; padding-left:10px;">Loading...</div></div>
+
+    <div class="container">
+        <div class="product-grid" id="productGrid">
+            <div id="loader" class="status-container"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>
+            <div id="noResult" class="status-container" style="display:none;"><i class="fas fa-search"></i><p>No products found!</p></div>
+        </div>
+    </div>
+
+<script>
+    const REPO = "Subeesh-Zero/VPECom";
+    const BASE_URL = `https://raw.githubusercontent.com/${REPO}/main`;
+
+    let allProducts = [];
+    let displayedProducts = [];
+    let categories = []; 
+    let globalOffer = 0;
+
+    window.onload = async () => { await fetchData(); };
+
+    async function fetchData() {
+        const ts = Date.now();
+        try {
+            const setRes = await fetch(`${BASE_URL}/settings.json?t=${ts}`);
+            if(setRes.ok) {
+                const s = await setRes.json();
+                if(s.categories) categories = s.categories;
+                if(s.wholeWebsiteOffer) globalOffer = parseInt(s.wholeWebsiteOffer);
+            }
+        } catch(e) {}
+
+        renderCategories();
+        if(globalOffer > 0) {
+            document.getElementById('offer-val').innerText = globalOffer;
+            document.getElementById('offer-banner').style.display = 'block';
+        }
+
+        try {
+            const res = await fetch(`${BASE_URL}/all_products.json?t=${ts}`);
+            if(!res.ok) throw new Error("No Data");
+            allProducts = await res.json();
+            displayedProducts = allProducts;
+            renderGrid();
+        } catch(e) {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('noResult').style.display = 'flex';
+        }
+    }
+
+    function renderGrid() {
+        const grid = document.getElementById('productGrid');
+        // Keep loaders, remove cards
+        const loader = document.getElementById('loader');
+        const noResult = document.getElementById('noResult');
+        
+        // Remove existing cards only
+        Array.from(grid.children).forEach(child => {
+            if(child.classList.contains('card')) grid.removeChild(child);
+        });
+
+        loader.style.display = 'none';
+        
+        if(displayedProducts.length === 0) {
+            noResult.style.display = 'flex';
+            return;
+        }
+        noResult.style.display = 'none';
+
+        displayedProducts.forEach(p => {
+            let price = parseInt(p.price);
+            let pOffer = parseInt(p.offer) || 0;
+            let finalOffer = Math.max(globalOffer, pOffer);
+            let finalPrice = Math.floor(price - (price * finalOffer / 100));
+            
+            let img = (p.images && p.images.length > 0) ? p.images[0] : p.image;
+            
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => window.location.href = `product.html?id=${p.id}`;
+            
+            // 🔥 MAGIC FIX: onerror="this.closest('.card').remove()"
+            // If image fails to load (because it was deleted), remove the card instantly!
+            card.innerHTML = `
+                <img src="${img}" class="card-img" loading="lazy" onerror="this.closest('.card').remove()">
+                <div class="details">
+                    <div class="title">${p.title}</div>
+                    <div class="price-row">
+                        <span class="price">₹${finalPrice}</span>
+                        ${finalOffer > 0 ? `<span class="mrp">₹${price}</span><span class="off">${finalOffer}% off</span>` : ''}
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function filterCat(cat, btn=null) {
+        if(btn) {
+            document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        document.getElementById('sidebar').classList.remove('active');
+        document.querySelector('.overlay').classList.remove('active');
+        if(cat === 'All') displayedProducts = allProducts;
+        else displayedProducts = allProducts.filter(p => p.category === cat);
+        renderGrid();
+    }
+
+    function searchProducts(q) {
+        const term = q.toLowerCase();
+        displayedProducts = allProducts.filter(p => p.title.toLowerCase().includes(term));
+        renderGrid();
+    }
+
+    function renderCategories() {
+        const sidebarDiv = document.getElementById('sidebar-cats');
+        const topStripDiv = document.getElementById('top-cat-strip');
+        sidebarDiv.innerHTML = `<div class="menu-item" onclick="filterCat('All')"><i class="fas fa-th-large"></i> All Products</div>`;
+        topStripDiv.innerHTML = `<div class="cat-pill active" onclick="filterCat('All', this)">All</div>`;
+        categories.forEach(cat => {
+            sidebarDiv.innerHTML += `<div class="menu-item" onclick="filterCat('${cat}')"><i class="fas fa-tag"></i> ${cat}</div>`;
+            topStripDiv.innerHTML += `<div class="cat-pill" onclick="filterCat('${cat}', this)">${cat}</div>`;
+        });
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+        document.querySelector('.overlay').classList.toggle('active');
+    }
+</script>
+
+</body>
+</html>
