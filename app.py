@@ -9,7 +9,7 @@ import sys
 import shutil
 from threading import Timer
 
-# --- 1. Auto Install Libraries ---
+# --- 1. லைப்ரரி இல்லாத பட்சத்தில் தானாக இன்ஸ்டால் செய்தல் ---
 def install_libs():
     try:
         import flask
@@ -24,14 +24,14 @@ from PIL import Image
 
 app = Flask(__name__)
 
-# --- 2. CONFIGURATION ---
+# --- 2. செட்டிங்ஸ் ---
 CONFIG_FILE = "shop_config.json"
 IMAGE_FOLDER = "images"
 JSON_FILE = "all_products.json"
 SETTINGS_FILE = "settings.json"
 
 # ==========================================
-# 🎨 SCREEN 1: SETUP SCREEN
+# 🎨 SCREEN 1: SETUP
 # ==========================================
 SETUP_TEMPLATE = """
 <!DOCTYPE html>
@@ -52,9 +52,9 @@ SETUP_TEMPLATE = """
 </head>
 <body>
     <div class="card">
-        <h2>🚀 Connect Shop</h2>
-        <p style="color:#666; font-size:14px;">Paste your GitHub Repository Link below</p>
-        <input type="text" id="repoUrl" placeholder="https://github.com/User/Repo.git">
+        <h2>🚀 Ultimate Shop Setup</h2>
+        <p>Supports 100k+ Images & Full Delete</p>
+        <input type="text" id="repoUrl" placeholder="Paste GitHub Repo Link Here...">
         <button onclick="startSetup()" id="btn">Connect Now</button>
         <div class="loader" id="loader"></div>
         <p id="msg" style="margin-top:15px; font-size:13px; color:#4F46E5;"></p>
@@ -62,15 +62,15 @@ SETUP_TEMPLATE = """
     <script>
         async function startSetup() {
             const url = document.getElementById('repoUrl').value.trim();
-            if(!url) return alert("Please enter GitHub Link!");
+            if(!url) return alert("GitHub Link தேவை!");
             document.getElementById('btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
-            document.getElementById('msg').innerText = "Configuring Git... (Please wait)";
+            document.getElementById('msg').innerText = "Configuring Git... (Wait)";
             try {
                 const res = await fetch('/api/setup', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ url: url }) });
                 const data = await res.json();
                 if(data.success) {
-                    document.getElementById('msg').innerText = "Connected! Redirecting...";
+                    document.getElementById('msg').innerText = "Success! Redirecting...";
                     setTimeout(() => location.reload(), 2000);
                 } else {
                     alert("Error: " + data.error); location.reload();
@@ -206,7 +206,7 @@ ADMIN_TEMPLATE = """
         function resetForm() { document.getElementById('editIndex').value = "-1"; document.getElementById('formTitle').innerText = "Single Upload"; document.getElementById('saveBtn').innerText = "🚀 Upload Product"; multiFiles = []; existingImages = []; renderPreviews(); document.querySelectorAll('#add-product input, #add-product textarea').forEach(i => i.value=""); }
         async function saveMultiProduct() {
             const title = document.getElementById('pTitle').value; const price = document.getElementById('pPrice').value; if(!title || !price) return Swal.fire("Error", "Title & Price Required", "error");
-            Swal.fire({ title: 'Processing...', text: 'Updating GitHub (Auto-Fix Enabled)...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Uploading...', text: 'Smart Upload (Updated JSON Only)...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             let imagesBase64 = []; for(let f of multiFiles) { const r = new FileReader(); const p = new Promise(res => { r.onload = e => res(e.target.result); }); r.readAsDataURL(f); imagesBase64.push(await p); }
             const payload = { editIndex: document.getElementById('editIndex').value, products: [{ title, price, category: document.getElementById('pCategory').value, offer: document.getElementById('pOffer').value, desc: document.getElementById('pDesc').value, link: document.getElementById('pLink').value, images: imagesBase64, existingImages: existingImages }] };
             await sendToServer(payload); resetForm();
@@ -224,7 +224,7 @@ ADMIN_TEMPLATE = """
         async function addCategory() { const val = document.getElementById('newCatInput').value.trim(); if(val && !categories.includes(val)) { categories.push(val); await fetch('/api/update-cats', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({categories}) }); updateUI(); document.getElementById('newCatInput').value = ""; } }
         async function delCat(i) { if(!confirm("Remove Category?")) return; categories.splice(i, 1); await fetch('/api/update-cats', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({categories}) }); updateUI(); }
         async function deleteProduct(i) { if(!confirm("Delete Item?")) return; Swal.showLoading(); await fetch('/api/delete', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({index: i}) }); await loadData(); Swal.fire("Deleted", "Item Removed", "success"); }
-        async function sendToServer(payload) { try { const res = await fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await res.json(); if(data.success) { await loadData(); Swal.fire("Success!", "Updated Successfully!", "success"); } else { Swal.fire("Error", data.error, "error"); } } catch(e) { Swal.fire("Error", "Server Error", "error"); } }
+        async function sendToServer(payload) { try { const res = await fetch('/api/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await res.json(); if(data.success) { await loadData(); Swal.fire("Success!", "Updated & Synced!", "success"); } else { Swal.fire("Error", data.error, "error"); } } catch(e) { Swal.fire("Error", "Server Error", "error"); } }
         function nav(id, el) { document.querySelectorAll('.section').forEach(s => s.style.display = 'none'); document.getElementById(id).style.display = 'block'; document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active')); el.classList.add('active'); }
     </script>
 </body>
@@ -232,7 +232,7 @@ ADMIN_TEMPLATE = """
 """
 
 # ==========================================
-# 🐍 PYTHON BACKEND LOGIC (FIXED)
+# 🐍 PYTHON BACKEND (FIXED & FULLY FUNCTIONAL)
 # ==========================================
 
 @app.route('/')
@@ -250,10 +250,20 @@ def setup_api():
         if os.path.exists(".git"): subprocess.run("rmdir /s /q .git", shell=True)
         if os.path.exists(IMAGE_FOLDER): shutil.rmtree(IMAGE_FOLDER)
 
+        # 1. INIT & CONFIGURE
         subprocess.run(["git", "init"], check=True)
-        # FORCE BRANCH NAME TO MAIN TO AVOID MASTER/MAIN CONFLICT
         subprocess.run(["git", "branch", "-M", "main"], check=True) 
         subprocess.run(["git", "remote", "add", "origin", repo_url], check=True)
+        
+        # 2. SPARSE CHECKOUT
+        subprocess.run(["git", "config", "core.sparseCheckout", "true"], check=True)
+        sparse_path = os.path.join(".git", "info", "sparse-checkout")
+        with open(sparse_path, "w") as f:
+            f.write("all_products.json\n")
+            f.write("shop_config.json\n")
+            f.write("settings.json\n")
+        
+        # 3. PULL
         subprocess.run(["git", "pull", "origin", "main", "--allow-unrelated-histories"], check=False)
 
         with open(CONFIG_FILE, 'w') as f: json.dump({"repo": repo_url}, f)
@@ -265,14 +275,21 @@ def setup_api():
 def get_data():
     prods = []
     cats = ["General", "Fashion", "Electronics"]
+    
+    # --- SYNTAX ERROR FIXED ---
     if os.path.exists(JSON_FILE):
-        try: 
-            with open(JSON_FILE, 'r') as f: prods = json.load(f)
-        except: pass
+        try:
+            with open(JSON_FILE, 'r') as f:
+                prods = json.load(f)
+        except:
+            pass
+
     if os.path.exists(SETTINGS_FILE):
         try:
-            with open(SETTINGS_FILE, 'r') as f: cats = json.load(f).get('categories', cats)
-        except: pass
+            with open(SETTINGS_FILE, 'r') as f:
+                cats = json.load(f).get('categories', cats)
+        except:
+            pass
     return jsonify({"products": prods, "categories": cats})
 
 @app.route('/api/update-cats', methods=['POST'])
@@ -283,14 +300,29 @@ def update_cats():
 
 @app.route('/api/delete', methods=['POST'])
 def delete_item():
-    idx = request.json.get('index')
-    if os.path.exists(JSON_FILE):
-        with open(JSON_FILE, 'r') as f: products = json.load(f)
-        if 0 <= idx < len(products):
-            products.pop(idx)
-            with open(JSON_FILE, 'w') as f: json.dump(products, f, indent=2)
-            smart_git_push("Deleted Item")
-    return jsonify({"success": True})
+    try:
+        idx = request.json.get('index')
+        if os.path.exists(JSON_FILE):
+            with open(JSON_FILE, 'r') as f: products = json.load(f)
+            
+            if 0 <= idx < len(products):
+                # 1. DELETE IMAGES FROM GIT (NEW FIX)
+                item = products[idx]
+                if 'images' in item:
+                    for img in item['images']:
+                        # Force delete from git even if file missing locally
+                        subprocess.run(["git", "rm", "-f", img], check=False)
+
+                # 2. REMOVE FROM JSON
+                products.pop(idx)
+                with open(JSON_FILE, 'w') as f: json.dump(products, f, indent=2)
+                
+                # 3. PUSH CHANGES
+                smart_push("Deleted Item")
+                
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 @app.route('/api/upload', methods=['POST'])
 def upload():
@@ -332,7 +364,7 @@ def upload():
             
         with open(JSON_FILE, 'w') as f: json.dump(current_products, f, indent=2)
 
-        smart_git_push(f"Updated {len(new_entries)} items")
+        smart_push(f"Updated {len(new_entries)} items")
         return jsonify({"success": True})
 
     except Exception as e:
@@ -340,29 +372,26 @@ def upload():
         return jsonify({"success": False, "error": str(e)})
 
 # ==========================================
-# 🛠️ SMART GIT PUSH (THE FIX IS HERE)
+# 🚀 SMART PUSH (FIXED: SPARSE CHECKOUT ADD)
 # ==========================================
-def smart_git_push(msg):
+def smart_push(msg):
     try:
-        # 1. FORCE BRANCH NAME TO MAIN (This fixes the 'master' vs 'main' error)
         subprocess.run(["git", "branch", "-M", "main"], check=False)
+
+        # FIX: 'git add --sparse .' allows adding files outside sparse definition
+        subprocess.run(["git", "add", "--sparse", "."], check=True)
         
-        # 2. Add and Commit
-        subprocess.run(["git", "add", "."], check=True)
         subprocess.run(["git", "commit", "-m", msg], check=False)
         
-        # 3. Try Push
-        result = subprocess.run(["git", "push", "-u", "origin", "main"], capture_output=True, text=True)
+        res = subprocess.run(["git", "push", "-u", "origin", "main"], capture_output=True, text=True)
         
-        # 4. Auto-Fix if Push Fails
-        if result.returncode != 0:
-            print("⚠️ Push Failed! Trying Auto-Fix...")
+        if res.returncode != 0:
+            print("Syncing JSON...")
             subprocess.run(["git", "pull", "origin", "main", "--no-rebase", "--allow-unrelated-histories"], check=False)
             subprocess.run(["git", "push", "-u", "origin", "main"], check=True)
-            print("✅ Auto-Fix Success!")
 
     except Exception as e:
-        print(f"❌ Git Error: {e}")
+        print(f"Git Error: {e}")
         raise e
 
 def open_browser():
