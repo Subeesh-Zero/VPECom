@@ -1,14 +1,5 @@
 [
   {
-    "title": "r",
-    "price": "4",
-    "category": "General",
-    "images": [
-      "images/img_1770556264644_0.webp"
-    ],
-    "image": "images/img_1770556264644_0.webp"
-  },
-  {
     "id": 1770556051362,
     "title": "e",
     "price": "2",
