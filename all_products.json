@@ -1,20 +1,5 @@
 [
   {
-    "id": 1770553031737,
-    "title": "ss",
-    "price": "333",
-    "category": "pc",
-    "offer": "33",
-    "description": "d",
-    "buyLink": "https://github.com/Subeesh-Zero/VPECom",
-    "images": [
-      "images/ss_1770553031737_0.webp",
-      "images/ss_1770553031737_1.webp",
-      "images/ss_1770553031737_2.webp"
-    ],
-    "image": "images/ss_1770553031737_0.webp"
-  },
-  {
     "id": 1770540571889.1177,
     "title": "Git3",
     "category": "Hi",
