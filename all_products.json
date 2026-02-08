@@ -1,19 +1,5 @@
 [
   {
-    "id": 1770556051362,
-    "title": "e",
-    "price": "2",
-    "category": "Love",
-    "offer": "1",
-    "description": "d",
-    "buyLink": "https://github.com/Subeesh-Zero/VPECom.git",
-    "images": [
-      "images/e_1770556051362_0.webp",
-      "images/e_1770556051362_1.webp"
-    ],
-    "image": "images/e_1770556051362_0.webp"
-  },
-  {
     "id": 1770540571889.1177,
     "title": "Git3",
     "category": "Hi",
