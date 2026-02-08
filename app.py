@@ -9,7 +9,7 @@ import sys
 import shutil
 from threading import Timer
 
-# --- 1. Auto Install Libraries ---
+# --- 1. லைப்ரரி இல்லாத பட்சத்தில் தானாக இன்ஸ்டால் செய்தல் ---
 def install_libs():
     try:
         import flask
@@ -24,14 +24,14 @@ from PIL import Image
 
 app = Flask(__name__)
 
-# --- 2. CONFIGURATION ---
+# --- 2. செட்டிங்ஸ் ---
 CONFIG_FILE = "shop_config.json"
 IMAGE_FOLDER = "images"
 JSON_FILE = "all_products.json"
 SETTINGS_FILE = "settings.json"
 
 # ==========================================
-# 🎨 SCREEN 1: SETUP
+# 🎨 SCREEN 1: SETUP (முதல் முறை மட்டும்)
 # ==========================================
 SETUP_TEMPLATE = """
 <!DOCTYPE html>
@@ -43,6 +43,7 @@ SETUP_TEMPLATE = """
         body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
         .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 400px; }
         h2 { color: #4F46E5; margin-bottom: 10px; }
+        p { color: #666; font-size: 14px; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: #4F46E5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition:0.3s; }
         button:hover { background: #4338ca; }
@@ -52,8 +53,8 @@ SETUP_TEMPLATE = """
 </head>
 <body>
     <div class="card">
-        <h2>🚀 Image Upload Fix</h2>
-        <p>100k+ Support + Force Upload</p>
+        <h2>🚀 Ultimate Shop Setup</h2>
+        <p>Supports 100k+ Images & Fast Upload</p>
         <input type="text" id="repoUrl" placeholder="Paste GitHub Repo Link Here...">
         <button onclick="startSetup()" id="btn">Connect Now</button>
         <div class="loader" id="loader"></div>
@@ -62,10 +63,10 @@ SETUP_TEMPLATE = """
     <script>
         async function startSetup() {
             const url = document.getElementById('repoUrl').value.trim();
-            if(!url) return alert("GitHub Link Required!");
+            if(!url) return alert("GitHub Link தேவை!");
             document.getElementById('btn').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
-            document.getElementById('msg').innerText = "Configuring Git... (Wait)";
+            document.getElementById('msg').innerText = "Configuring Git & Sparse Checkout... (Wait)";
             try {
                 const res = await fetch('/api/setup', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ url: url }) });
                 const data = await res.json();
