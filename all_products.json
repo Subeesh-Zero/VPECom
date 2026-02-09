@@ -2,9 +2,9 @@
   {
     "id": 1770561777892,
     "title": "t",
-    "price": "44",
+    "price": 44,
     "category": "Pc",
-    "offer": "2",
+    "offer": 2,
     "description": "d",
     "buyLink": "https://github.com/Subeesh-Zero/VPECom/tree/main",
     "images": [
