@@ -61,9 +61,9 @@
   {
     "id": 1770537661461,
     "title": "New1",
+    "price": 200,
     "category": "Hi",
-    "price": "200",
-    "offer": "50",
+    "offer": 50,
     "description": "D",
     "buyLink": "https://instagram.com/accounts/password/reset/confirm/?uidb36=ph73fc2&token=cHBTy9Ph5b3l0KXYz6P8711el7XOT4zyOpk0aCY8piqKnGTpS6UksfA4xkYWnhJL:one_click_login_email&s=one_click_login_email&is_caa=0&afv=LEGACY_FLOW",
     "images": [
