@@ -1,5 +1,18 @@
 [
   {
+    "id": 1774045811706,
+    "title": "Product 2",
+    "price": 300,
+    "category": "funn",
+    "offer": 80,
+    "description": "htrh",
+    "images": [
+      "https://raw.githubusercontent.com/Subeesh-Zero/VPECom/main/images/b41244e3e3c5.webp",
+      "https://raw.githubusercontent.com/Subeesh-Zero/VPECom/main/images/b3ec7f863c99.webp"
+    ],
+    "image": "https://raw.githubusercontent.com/Subeesh-Zero/VPECom/main/images/b41244e3e3c5.webp"
+  },
+  {
     "id": 1774045803048,
     "title": "prodect1",
     "price": 100,
