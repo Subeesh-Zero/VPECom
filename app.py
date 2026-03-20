@@ -22,7 +22,7 @@ def start_my_app():
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.FileHandler('vpecom.log'),
+            logging.FileHandler('run.log'),
             logging.StreamHandler()
         ]
     )
@@ -1059,6 +1059,11 @@ def start_my_app():
                     <i class="fas fa-image"></i>
                     <span class="nav-text">Banners</span>
                 </a>
+                <!-- New Store Settings Tab -->
+                <a href="#" class="nav-item" onclick="nav('store-settings', this)">
+                    <i class="fas fa-cog"></i>
+                    <span class="nav-text">Store Settings</span>
+                </a>
             </div>
             
             <div class="sidebar-footer">
@@ -1122,6 +1127,9 @@ def start_my_app():
                         </button>
                         <button class="btn btn-secondary" onclick="nav('banners', document.querySelectorAll('.nav-item')[5])">
                             <i class="fas fa-image"></i> Manage Banners
+                        </button>
+                        <button class="btn btn-secondary" onclick="nav('store-settings', document.querySelectorAll('.nav-item')[6])">
+                            <i class="fas fa-cog"></i> Store Settings
                         </button>
                     </div>
                 </div>
@@ -1189,10 +1197,7 @@ def start_my_app():
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Buy Link *</label>
-                        <input type="text" id="pLink" class="form-control" placeholder="https://example.com/product">
-                    </div>
+                    <!-- Buy Link removed from here -->
                     
                     <div class="form-group">
                         <label class="form-label">Description</label>
@@ -1338,6 +1343,28 @@ def start_my_app():
                     </div>
                 </div>
             </div>
+
+            <!-- NEW Store Settings Section -->
+            <div id="store-settings" class="section" style="display:none;">
+                <div class="header">
+                    <h1 class="page-title">Store Settings</h1>
+                </div>
+                
+                <div class="card">
+                    <h3 class="card-title" style="margin-bottom: 16px;">WhatsApp Configuration</h3>
+                    <p style="color: var(--gray); margin-bottom: 20px;">Set the global WhatsApp number for all products. This number will be used for customer inquiries and orders.</p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">WhatsApp Number (without country code)</label>
+                        <input type="text" id="storeWhatsapp" class="form-control" placeholder="e.g., 9876543210">
+                        <p style="font-size: 12px; color: var(--gray); margin-top: 4px;">Enter only digits, without +91 or spaces.</p>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="saveSettings()" style="margin-top: 8px;">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+            </div>
         </div>
 
     <script>
@@ -1348,6 +1375,7 @@ def start_my_app():
         let banners = []; // Store banners data
         let bulkRowImagePreviews = {}; // Store bulk row image previews
         let selectedProducts = new Set(); // Store selected product indices
+        let whatsappNumber = ''; // Global WhatsApp number
 
         window.onload = function() {
             loadData();
@@ -1363,6 +1391,7 @@ def start_my_app():
                 filteredProducts = [...products];
                 categories = data.categories || [];
                 banners = data.banners || [];
+                whatsappNumber = data.whatsapp || '';
                 updateUI();
             } catch (error) {
                 console.error('Failed to load data:', error);
@@ -1402,6 +1431,12 @@ def start_my_app():
 
             renderBannersList();
             renderProductTable();
+            
+            // Bind WhatsApp number to input field
+            const whatsappInput = document.getElementById('storeWhatsapp');
+            if (whatsappInput) {
+                whatsappInput.value = whatsappNumber;
+            }
         }
 
         function renderProductTable(searchTerm = '') {
@@ -1831,12 +1866,11 @@ def start_my_app():
             const title = document.getElementById('pTitle').value.trim();
             const price = document.getElementById('pPrice').value.trim();
             const category = document.getElementById('pCategory').value;
-            const link = document.getElementById('pLink').value.trim();
             const description = document.getElementById('pDesc').value.trim();
             const editIndex = parseInt(document.getElementById('editIndex').value);
             const files = document.getElementById('pFiles').files;
             
-            if (!title || !price || !category || !link) {
+            if (!title || !price || !category) {
                 Swal.fire('Missing Info', 'Please fill all required fields', 'error');
                 return;
             }
@@ -1875,7 +1909,6 @@ def start_my_app():
                         category: category,
                         offer: parseInt(document.getElementById('pOffer').value) || 0,
                         description: description,
-                        link: link,
                         existingImages: editingProductImages, // Keep these as-is
                         newImages: newProductImages, // Upload these as new
                         removedImages: removedExistingImages // Track removed for backend cleanup
@@ -1932,7 +1965,6 @@ def start_my_app():
             document.getElementById('pTitle').value = '';
             document.getElementById('pPrice').value = '';
             document.getElementById('pOffer').value = '0';
-            document.getElementById('pLink').value = '';
             document.getElementById('pDesc').value = '';
             document.getElementById('pCategory').value = '';
             document.getElementById('pFiles').value = '';
@@ -1962,7 +1994,6 @@ def start_my_app():
             document.getElementById('pTitle').value = product.title || '';
             document.getElementById('pPrice').value = product.price || '';
             document.getElementById('pOffer').value = product.offer || 0;
-            document.getElementById('pLink').value = product.buyLink || product.link || '';
             document.getElementById('pDesc').value = product.description || product.desc || '';
             
             // Set category
@@ -2042,10 +2073,7 @@ def start_my_app():
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Buy Link</label>
-                    <input type="text" id="bulk-link-${id}" class="form-control" placeholder="https://...">
-                </div>
+                <!-- Buy Link removed from bulk upload -->
                 
                 <div class="form-group">
                     <label class="form-label">Description</label>
@@ -2234,7 +2262,6 @@ def start_my_app():
                             category: document.getElementById(`bulk-category-${id}`).value,
                             offer: parseInt(document.getElementById(`bulk-offer-${id}`).value) || 0,
                             description: description,
-                            link: document.getElementById(`bulk-link-${id}`).value.trim(),
                             existingImages: [],
                             newImages: bulkRowImagePreviews[id],
                             removedImages: []
@@ -2469,6 +2496,46 @@ def start_my_app():
             renderProductTable(searchTerm);
         }
 
+        // --- STORE SETTINGS ---
+        async function saveSettings() {
+            const whatsapp = document.getElementById('storeWhatsapp').value.trim();
+            if (!whatsapp) {
+                Swal.fire('Required', 'Please enter a WhatsApp number', 'warning');
+                return;
+            }
+            // Basic validation: only digits
+            if (!/^\d+$/.test(whatsapp)) {
+                Swal.fire('Invalid Number', 'WhatsApp number should contain only digits', 'error');
+                return;
+            }
+            
+            const btn = document.querySelector('#store-settings .btn-primary');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loader"></span> Saving...';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch('/api/update-settings', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ whatsappNumber: whatsapp })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    whatsappNumber = whatsapp;
+                    Swal.fire('Success', 'Settings saved successfully', 'success');
+                } else {
+                    throw new Error('Failed to save');
+                }
+            } catch (error) {
+                console.error('Save settings error:', error);
+                Swal.fire('Error', 'Failed to save settings', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
         // --- NAVIGATION ---
         function nav(id, el) {
             document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
@@ -2645,15 +2712,17 @@ def start_my_app():
                     logger.error(f"Error parsing products: {e}")
                     prods = []
             
-            # Get categories
+            # Get categories and whatsapp number from settings.json
             cats = []
+            whatsapp = ''
             res_s = github_api("GET", f"{conf['repo']}/contents/settings.json", conf['token'])
             if res_s and res_s.status_code == 200:
                 try:
                     settings = json.loads(base64.b64decode(res_s.json()['content']).decode('utf-8'))
                     cats = settings.get('categories', [])
+                    whatsapp = settings.get('whatsappNumber', '')
                 except Exception as e:
-                    logger.error(f"Error parsing categories: {e}")
+                    logger.error(f"Error parsing settings: {e}")
             
             # Get banners
             banner_list = []
@@ -2666,10 +2735,49 @@ def start_my_app():
                     logger.error(f"Error parsing banners: {e}")
                     banner_list = []
             
-            return jsonify({"products": prods, "categories": cats, "banners": banner_list})
+            return jsonify({"products": prods, "categories": cats, "banners": banner_list, "whatsapp": whatsapp})
         except Exception as e:
             logger.error(f"Get data error: {e}")
-            return jsonify({"products": [], "categories": [], "banners": []})
+            return jsonify({"products": [], "categories": [], "banners": [], "whatsapp": ""})
+
+    @flask_app.route('/api/update-settings', methods=['POST'])
+    def update_settings():
+        logger.info("Update settings API called")
+        try:
+            with open(CONFIG_FILE, 'r') as f: 
+                conf = json.load(f)
+            
+            data = request.json
+            whatsapp_number = data.get('whatsappNumber', '')
+            
+            # Get existing settings
+            res = github_api("GET", f"{conf['repo']}/contents/settings.json", conf['token'])
+            if res and res.status_code == 200:
+                settings = json.loads(base64.b64decode(res.json()['content']).decode('utf-8'))
+                sha = res.json()['sha']
+            else:
+                settings = {"categories": []}
+                sha = None
+            
+            # Update whatsapp number
+            settings['whatsappNumber'] = whatsapp_number
+            
+            # Prepare content
+            content = base64.b64encode(json.dumps(settings, indent=2).encode('utf-8')).decode('utf-8')
+            payload = {
+                "message": "Update WhatsApp number",
+                "content": content,
+                "sha": sha
+            }
+            
+            put_res = github_api("PUT", f"{conf['repo']}/contents/settings.json", conf['token'], payload)
+            if put_res and put_res.status_code in [200, 201]:
+                return jsonify({"success": True})
+            else:
+                return jsonify({"success": False, "error": "Failed to update settings"})
+        except Exception as e:
+            logger.error(f"Update settings error: {e}")
+            return jsonify({"success": False, "error": str(e)})
 
     @flask_app.route('/api/update-cats', methods=['POST'])
     def update_cats():
@@ -2761,7 +2869,7 @@ def start_my_app():
             # Combine existing (non-removed) images with new images
             all_image_urls = existing_images + new_image_urls
             
-            # Create product object
+            # Create product object (buyLink removed)
             item = {
                 "id": ts if edit_idx == -1 else prods[edit_idx].get('id', ts),
                 "title": prod.get('title', ''),
@@ -2769,7 +2877,6 @@ def start_my_app():
                 "category": prod.get('category', 'General'),
                 "offer": prod.get('offer', 0),
                 "description": prod.get('description', prod.get('desc', '')),
-                "buyLink": prod.get('link', ''),
                 "images": all_image_urls,
                 "image": all_image_urls[0] if all_image_urls else ""
             }
@@ -2840,7 +2947,7 @@ def start_my_app():
                 if upload_res and upload_res.status_code in [200, 201]:
                     new_image_urls.append(f"https://raw.githubusercontent.com/{conf['repo']}/main/{fname}")
             
-            # Create product object
+            # Create product object (buyLink removed)
             item = {
                 "id": ts,
                 "title": prod.get('title', ''),
@@ -2848,7 +2955,6 @@ def start_my_app():
                 "category": prod.get('category', 'General'),
                 "offer": prod.get('offer', 0),
                 "description": prod.get('description', ''),
-                "buyLink": prod.get('link', ''),
                 "images": new_image_urls,
                 "image": new_image_urls[0] if new_image_urls else ""
             }
@@ -3063,7 +3169,7 @@ def start_my_app():
     
     print("\nApp is now running!")
     print("Access at: http://127.0.0.1:5000")
-    print("Check vpecom.log for detailed logs")
+    print("Check run.log for detailed logs")
     
     try:
         while flask_thread.is_alive():
