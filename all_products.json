@@ -1,5 +1,17 @@
 [
   {
+    "id": 1774045821556,
+    "title": "Product 3",
+    "price": 3000,
+    "category": "pro",
+    "offer": 50,
+    "description": "prooo",
+    "images": [
+      "https://raw.githubusercontent.com/Subeesh-Zero/VPECom/main/images/e79aef67486b.webp"
+    ],
+    "image": "https://raw.githubusercontent.com/Subeesh-Zero/VPECom/main/images/e79aef67486b.webp"
+  },
+  {
     "id": 1774045811706,
     "title": "Product 2",
     "price": 300,
